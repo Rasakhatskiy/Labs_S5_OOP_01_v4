@@ -8,5 +8,5 @@ interface IVan {
     fun clear()
     override fun toString() : String
     fun findProduct(range: QualityRange) : IProduct?
-    fun loadFromDB() : List<IProduct>?
+    fun loadFromDB()
 }

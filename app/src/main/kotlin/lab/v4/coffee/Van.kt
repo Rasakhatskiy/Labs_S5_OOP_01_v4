@@ -1,9 +1,6 @@
 package lab.v4.coffee
 
-import io.github.cdimascio.dotenv.dotenv
-import java.sql.Connection
-import java.sql.DriverManager
-import java.sql.SQLException
+import java.lang.RuntimeException
 
 
 class Van : IVan {
@@ -38,7 +35,7 @@ class Van : IVan {
     }
 
     override fun toString() : String {
-        var result = "lab.v4.coffee.Van. Volume: $volume. Products:\n"
+        var result = "Coffee Van. Volume: $volume. Products:\n"
         products.forEach{ it ->
             result += "\t${it.toString()}\n\n"
         }
@@ -53,40 +50,21 @@ class Van : IVan {
         return null
     }
 
-    override fun loadFromDB(): List<IProduct>? {
-        println("Testing connection to PostgreSQL JDBC");
+    override fun loadFromDB() {
         try {
-            Class.forName("org.postgresql.Driver")
-        } catch (e: ClassNotFoundException) {
-            println("PostgreSQL JDBC Driver is not found. Include it in your library path ")
-            e.printStackTrace()
-            return null
+            val connector = DBConnectorCoffee()
+            val coffeeList = connector.getCoffee()
+
+//            println("Loaded from DB:")
+//            val coffeeIterator = coffeeList.iterator()
+//            while (coffeeIterator.hasNext()) {
+//                println(coffeeIterator.next().toString())
+//            }
+//            println("\n\n")
+            loadProducts(coffeeList)
+        } catch (e: RuntimeException) {
+            println(e.message)
         }
-
-        println("PostgreSQL JDBC Driver successfully connected")
-        var connection: Connection?
-
-        val dotenv = dotenv()
-        val DB_URL = dotenv["DB_URL"]
-        val USER = dotenv["USER"]
-        val PASS = dotenv["PASS"]
-
-        connection = try {
-            DriverManager
-                .getConnection(DB_URL, USER, PASS)
-        } catch (e: SQLException) {
-            println("Connection Failed")
-            e.printStackTrace()
-            return null
-        }
-
-        if (connection != null) {
-            println("You successfully connected to database now")
-        } else {
-            println("Failed to make connection to database")
-        }
-
-        return null
     }
 
 }
